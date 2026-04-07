@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rutina de Gimnasio</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0f;
+    --surface: #161618;
+    --card: #1e1e21;
+    --border: #2a2a2e;
+    --accent: #e8ff47;
+    --accent2: #ff6b35;
+    --text: #f0f0f0;
+    --muted: #888;
+    --day1: #e8ff47;
+    --day2: #ff6b35;
+    --day3: #47c5ff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-top: 16px;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(232,255,71,0.1);
+    border: 1px solid rgba(232,255,71,0.25);
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 12vw, 88px);
+    letter-spacing: 0.03em;
+    line-height: 0.9;
+    color: var(--text);
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin: 28px 0 40px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .alert {
+    background: rgba(255,107,53,0.08);
+    border: 1px solid rgba(255,107,53,0.3);
+    border-left: 3px solid var(--accent2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 32px;
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .alert-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent2);
+    margin-bottom: 6px;
+  }
+
+  .alert p {
+    font-size: 13px;
+    color: #ccc;
+    line-height: 1.6;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 10px 22px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .tab:hover { border-color: #444; color: var(--text); }
+
+  .tab.active[data-day="1"] {
+    background: rgba(232,255,71,0.1);
+    border-color: var(--day1);
+    color: var(--day1);
+  }
+  .tab.active[data-day="2"] {
+    background: rgba(255,107,53,0.1);
+    border-color: var(--day2);
+    color: var(--day2);
+  }
+  .tab.active[data-day="3"] {
+    background: rgba(71,197,255,0.1);
+    border-color: var(--day3);
+    color: var(--day3);
+  }
+
+  .day-panel { display: none; max-width: 700px; margin: 0 auto; }
+  .day-panel.active { display: block; }
+
+  .day-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .day-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    letter-spacing: 0.03em;
+    line-height: 1;
+  }
+
+  [data-day="1"] .day-title { color: var(--day1); }
+  [data-day="2"] .day-title { color: var(--day2); }
+  [data-day="3"] .day-title { color: var(--day3); }
+
+  .day-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  .day-focus {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .time-badge {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 100px;
+    background: var(--card);
+    color: var(--muted);
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    margin: 20px 0 10px;
+    padding-left: 2px;
+  }
+
+  .exercise-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .exercise {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: center;
+    transition: border-color 0.2s;
+  }
+
+  .exercise:hover { border-color: #3a3a3e; }
+
+  .ex-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .ex-detail {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  .ex-badge {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 0.04em;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  [data-day="1"] .ex-badge { color: var(--day1); }
+  [data-day="2"] .ex-badge { color: var(--day2); }
+  [data-day="3"] .ex-badge { color: var(--day3); }
+
+  .ex-sub {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  .warmup {
+    background: rgba(255,255,255,0.02);
+    border-style: dashed;
+  }
+
+  .tip-box {
+    margin-top: 20px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+
+  .tip-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .tip-box ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .tip-box li {
+    font-size: 13px;
+    color: #bbb;
+    padding-left: 14px;
+    position: relative;
+    line-height: 1.5;
+  }
+
+  .tip-box li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--muted);
+    font-size: 11px;
+    top: 1px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 24px 0;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 48px;
+    font-size: 12px;
+    color: #555;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="tag">Rutina personalizada</div>
+  <h1>IRON<span>.</span><br>PLAN</h1>
+  <p class="subtitle">Adaptada a lesión de Bankart · Hombro protegido · 3 días / semana</p>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-value">3</div><div class="stat-label">Días / semana</div></div>
+  <div class="stat"><div class="stat-value">≤60'</div><div class="stat-label">Por sesión</div></div>
+  <div class="stat"><div class="stat-value">90kg</div><div class="stat-label">Peso corporal</div></div>
+  <div class="stat"><div class="stat-value">0°</div><div class="stat-label">Hombro >90° activos</div></div>
+</div>
+
+<div class="alert">
+  <div class="alert-title">⚠ Bankart — Restricciones aplicadas</div>
+  <p>Se eliminan: press militar, fondos en paralelas, aperturas, pull-over, remo al cuello, y cualquier movimiento con el hombro por encima de 90°. El press inclinado se permite a máximo 30° con mancuernas y codos cerrados. El trabajo de hombro se limita a rotaciones externas e internas con el brazo pegado al cuerpo. Consulta con tu fisioterapeuta antes de empezar.</p>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" data-day="1" onclick="showDay(1)">Día 1 — Pecho & Tríceps</button>
+  <button class="tab" data-day="2" onclick="showDay(2)">Día 2 — Espalda & Bíceps</button>
+  <button class="tab" data-day="3" onclick="showDay(3)">Día 3 — Pierna & Core</button>
+</div>
+
+<!-- DÍA 1 -->
+<div class="day-panel active" data-day="1" id="day-1">
+  <div class="day-header">
+    <div>
+      <div class="day-title">DÍA 1</div>
+      <div class="day-focus">Pecho · Tríceps · Hombro anterior (seguro)</div>
+    </div>
+    <div class="day-meta">
+      <span class="time-badge">~55 min</span>
+    </div>
+  </div>
+
+  <div class="section-label">Calentamiento — 8 min</div>
+  <div class="exercise-list">
+    <div class="exercise warmup">
+      <div><div class="ex-name">Rotaciones de hombro con banda</div><div class="ex-detail">Codo pegado al cuerpo. Rotación externa e interna suave.</div></div>
+      <div><div class="ex-badge">2×15</div><div class="ex-sub">cada lado</div></div>
+    </div>
+    <div class="exercise warmup">
+      <div><div class="ex-name">Círculos de escápula en cuadrupedia</div><div class="ex-detail">Movilización activa sin cargar el hombro.</div></div>
+      <div><div class="ex-badge">1×10</div></div>
+    </div>
+    <div class="exercise warmup">
+      <div><div class="ex-name">Bicicleta estática o remo suave</div><div class="ex-detail">Activación cardiovascular general.</div></div>
+      <div><div class="ex-badge">5 min</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Bloque principal — 42 min</div>
+  <div class="exercise-list">
+    <div class="exercise">
+      <div><div class="ex-name">Press banca plano con barra</div><div class="ex-detail">Codos a 45-60° del cuerpo. NO abrir los codos a 90°. Rango controlado, sin llegar al fallo.</div></div>
+      <div><div class="ex-badge">4×8</div><div class="ex-sub">2' descanso</div></div>
+    </div>
+    <div class="exercise">
+      <div><div class="ex-name">Press banca inclinado con mancuernas (30°)</div><div class="ex-detail">Inclinación máxima 30°. Codos a 45-60° del cuerpo, nunca abiertos. Rango corto y controlado.</div></div>
+      <div><div class="ex-badge">3×10</div><div class="ex-sub">90s descanso</div></div>
+    </div>
+    <div class="exercise">
+      <div><div class="ex-name">Cruces en polea baja</div><div class="ex-detail">Poleas bajas → movimiento hacia arriba sin superar los 90°. Controla la fase excéntrica.</div></div>
+      <div><div class="ex-badge">3×12</div><div class="ex-sub">60s descanso</div></div>
+    </div>
+    <div class="exercise">
+      <div><div class="ex-name">Elevaciones laterales con mancuerna (hasta 90°)</div><div class="ex-detail">Solo llegar a la horizontal. No levantar más. Peso ligero, control total.</div></div>
+      <div><div class="ex-badge">3×12</div><div class="ex-sub">60s descanso</div></div>
+    </div>
+    <div class="exercise">
+      <div><div class="ex-name">Extensión de tríceps en polea alta (cuerda)</div><div class="ex-detail">Codos fijos al cuerpo. Empuje hacia abajo. Seguro para el hombro.</div></div>
+      <div><div class="ex-badge">3×12</div><div class="ex-sub">60s descanso</div></div>
+    </div>
+    <div class="exercise">
+      <div><div class="ex-name">Kickback de tríceps con mancuerna</div><div class="ex-detail">Torso inclinado, codo pegado al cuerpo. Extiende el brazo hacia atrás hasta bloquearlo. Sin implicación de hombro. Muy seguro para Bankart.</div></div>
+      <div><div class="ex-badge">3×12</div><div class="ex-sub">cada lado · 60s</div></div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <div class="tip-title">⚡ Notas clave del día</div>
+    <ul>
+      <li>En press banca, baja la barra hasta rozar el pecho pero sin rebotar. Codos a 45°.</li>
+      <li>Las elevaciones laterales: para cuando el brazo llegue a la horizontal. Nada más.</li>
+      <li>Si el hombro molesta en algún ejercicio, detente y cambia por polea.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- DÍA 2 -->
+<div class="day-panel" data-day="2" id="day-2">
+  <div class="day-header">
+    <div>
+      <div class="day-title">DÍA 2</div>
+      <div class="day-focus">Espalda · Bíceps · Rotadores (rehabilitación)</div>
+    </div>
+    <div class="day-meta">
+      <span class="time-badge">~55 min</span>
+    </div>
+  </div>
+
+  <div class="section-label">Calentamiento — 8 min</div>
+  <div class="exercise-list">
+    <div class="exercise warmup">
+      <div><div class="ex-name">Rotación externa con banda (ángulo 0°)</div><div class="ex-detail">Codo a 90° pegado al costado. Abre lentamente hacia fuera. Fortalece el manguito.</div></div>
+      <div><div class="ex-badge">2×15</div><div class="ex-sub">cada lado</div></div>
+    </div>
+    <div class="exercise warmup">
+      <div><div class="ex-name">Face pull con banda o polea</div><div class="ex-detail">Llevar hacia la cara, codos a la altura de los hombros. Perfecto para Bankart.</div></div>
+      <div><div class="ex-badge">2×12</div></div>
+    </div>
+    <div class="exercise warmup">
+      <div><div class="ex-name">Cardio suave (elíptica/bici)</div></div>
+      <div><div class="ex-badge">5 min</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Bloque principal — 43 min</div>
+  <div class="exercise-list">
+    <div class="exercise">
+      <div><div class="ex-name">Remo con barra (agarre prono)</div><div class="ex-detail">Torso inclinado ~45°, remo hacia el ombligo. Uno de los mejores para la espalda con Bankart.</div></div>
+      <div><div class="ex-badge">4×8</div><div class="ex-sub">2' descanso</div></div>
+    </div>
+    <div class="exercise">
+      <div><div class="ex-name">Remo en polea baja con agarre neutro</div><div class="ex-detail">Espalda recta, retracción escapular al final del recorrido. Seguro y efectivo.</div></div>
+      <div><div class="ex-badge">3×10</div><div class="ex-sub">90s descanso</div></div>
+    </div>
+    <div class="exercise">
+      <div><div class="ex-name">Jalón al pecho en polea (agarre ancho)</div><div class="ex-detail">Llevar la barra hasta el pecho. Evita jalones detrás del cuello. Codos bajan lateralmente sin forzar.</div></div>
+      <div><div class="ex-badge">3×10</div><div class="ex-sub">90s descanso</div></div>
+    </div>
+    <div class="exercise">
+      <div><div class="ex-name">Remo con mancuerna a una mano</div><div class="ex-detail">Apoyo en banco, recorrido natural. Excelente aislamiento del dorsal.</div></div>
+      <div><div class="ex-badge">3×10</div><div class="ex-sub">cada lado · 60s</div></div>
+    </div>
+    <div class="exercise">
+      <div><div class="ex-name">Curl de bíceps con mancuernas (alterno)</div><div class="ex-detail">Codo pegado al cuerpo en todo momento. Supinación controlada.</div></div>
+      <div><div class="ex-badge">3×12</div><div class="ex-sub">60s descanso</div></div>
+    </div>
+    <div class="exercise">
+      <div><div class="ex-name">Curl martillo con mancuernas</div><div class="ex-detail">Agarre neutro. Trabaja braquial y braquiorradial. Cero implicación de hombro.</div></div>
+      <div><div class="ex-badge">3×12</div><div class="ex-sub">60s descanso</div></div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <div class="tip-title">⚡ Notas clave del día</div>
+    <ul>
+      <li>El face pull del calentamiento es casi terapéutico para el Bankart — no lo saltes.</li>
+      <li>En el jalón al pecho, no bajes los codos por detrás del torso. Para al llegar al pecho.</li>
+      <li>El remo con barra es el ejercicio estrella del día: prioriza carga aquí.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- DÍA 3 -->
+<div class="day-panel" data-day="3" id="day-3">
+  <div class="day-header">
+    <div>
+      <div class="day-title">DÍA 3</div>
+      <div class="day-focus">Pierna · Glúteo · Core</div>
+    </div>
+    <div class="day-meta">
+      <span class="time-badge">~55 min</span>
+    </div>
+  </div>
+
+  <div class="section-label">Calentamiento — 8 min</div>
+  <div class="exercise-list">
+    <div class="exercise warmup">
+      <div><div class="ex-name">Movilidad de cadera en cuadrupedia</div><div class="ex-detail">Círculos de cadera, apertura lateral. Activa glúteos.</div></div>
+      <div><div class="ex-badge">1×10</div><div class="ex-sub">cada lado</div></div>
+    </div>
+    <div class="exercise warmup">
+      <div><div class="ex-name">Sentadilla con peso corporal (suave)</div><div class="ex-detail">Calentamiento articular, rodillas bien alineadas.</div></div>
+      <div><div class="ex-badge">2×12</div></div>
+    </div>
+    <div class="exercise warmup">
+      <div><div class="ex-name">Bicicleta estática o elíptica</div></div>
+      <div><div class="ex-badge">5 min</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Bloque principal — 43 min</div>
+  <div class="exercise-list">
+    <div class="exercise">
+      <div><div class="ex-name">Sentadilla con barra en rack</div><div class="ex-detail">Barra en posición baja o media. Hombros solo sostienen la barra en horizontal — dentro del rango seguro.</div></div>
+      <div><div class="ex-badge">4×8</div><div class="ex-sub">2' descanso</div></div>
+    </div>
+    <div class="exercise">
+      <div><div class="ex-name">Prensa de piernas</div><div class="ex-detail">Alternativa cómoda si la sentadilla con barra molesta. Ajusta el ángulo de las rodillas.</div></div>
+      <div><div class="ex-badge">3×10</div><div class="ex-sub">90s descanso</div></div>
+    </div>
+    <div class="exercise">
+      <div><div class="ex-name">Peso muerto rumano con mancuernas</div><div class="ex-detail">Bisagra de cadera, espalda recta. Trabaja isquiotibiales y glúteo. Mancuernas → sin implicar hombro.</div></div>
+      <div><div class="ex-badge">3×10</div><div class="ex-sub">90s descanso</div></div>
+    </div>
+    <div class="exercise">
+      <div><div class="ex-name">Hip thrust con barra</div><div class="ex-detail">Barra sobre las caderas (con almohadilla). El mejor ejercicio para glúteo. Hombros no intervienen.</div></div>
+      <div><div class="ex-badge">3×12</div><div class="ex-sub">60s descanso</div></div>
+    </div>
+    <div class="exercise">
+      <div><div class="ex-name">Curl femoral en máquina (tumbado)</div><div class="ex-detail">Isquiotibiales en aislamiento. Movimiento seguro y controlado.</div></div>
+      <div><div class="ex-badge">3×12</div><div class="ex-sub">60s descanso</div></div>
+    </div>
+    <div class="exercise">
+      <div><div class="ex-name">Plancha frontal</div><div class="ex-detail">Core antiflexión. Mantén la posición sin arquear la espalda lumbar.</div></div>
+      <div><div class="ex-badge">3×45s</div><div class="ex-sub">45s descanso</div></div>
+    </div>
+    <div class="exercise">
+      <div><div class="ex-name">Máquina de aductores</div><div class="ex-detail">Rango de movimiento controlado, sin forzar el final del recorrido. Peso ligero al principio. Recomendado por fisio para equilibrar con isquios.</div></div>
+      <div><div class="ex-badge">3×12</div><div class="ex-sub">60s descanso</div></div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <div class="tip-title">⚡ Notas clave del día</div>
+    <ul>
+      <li>En sentadilla con barra, si el rack no llega a la altura ideal, usa goblet squat con mancuerna en su lugar.</li>
+      <li>El hip thrust es el ejercicio más importante del día. Aprieta glúteo en la parte alta del recorrido.</li>
+      <li>Este día no hay trabajo de hombro — es el más cómodo para tu lesión de Bankart.</li>
+    </ul>
+  </div>
+</div>
+
+<div style="max-width:700px; margin: 32px auto 0;">
+  <div class="divider"></div>
+  <div class="tip-box">
+    <div class="tip-title">📋 Consideraciones generales</div>
+    <ul>
+      <li>Días recomendados: Lunes / Miércoles / Viernes. Deja al menos 1 día de descanso entre sesiones.</li>
+      <li>Progresión: aumenta el peso solo cuando completes todas las series con buena técnica.</li>
+      <li>Ejercicios que evitar siempre con Bankart: press militar, aperturas, dips, remo al cuello, pull-over.</li>
+      <li>Si el hombro carga o duele durante algún ejercicio, detente. No intentes aguantar.</li>
+      <li>Esta rutina no sustituye el alta de tu fisioterapeuta — consúltala con él antes de empezar.</li>
+    </ul>
+  </div>
+</div>
+
+<footer>Rutina generada por Claude · Adaptada para lesión de Bankart · Consulta a tu fisio antes de comenzar</footer>
+
+<script>
+  function showDay(n) {
+    document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('day-' + n).classList.add('active');
+    document.querySelector('.tab[data-day="' + n + '"]').classList.add('active');
+  }
+</script>
+</body>
+</html>
